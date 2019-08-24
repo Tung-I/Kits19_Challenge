@@ -45,9 +45,9 @@ class _ResidualBlock(nn.Module):
 		self.in_channels = in_channels
 		self.out_channels = out_channels
 
-		self.norm_layer1 = nn.BatchNorm3d(out_channels)
+		self.norm_layer1 = nn.BatchNorm3d(in_channels)
 		self.active_layer1 = nn.RelU(inplace=True)
-		self.conv_layer1 = nn.Conv3d(out_channels, out_channels, kernel_size=3, padding=1, dilation=dilation_num)
+		self.conv_layer1 = nn.Conv3d(in_channels, out_channels, kernel_size=3, padding=1, dilation=dilation_num)
 		
 		self.norm_layer2 = nn.BatchNorm3d(out_channels)
 		self.active_layer2 = nn.RelU(inplace=True)
@@ -73,4 +73,3 @@ class _OutBlock(nn.Sequential):
 	def __init__(self, in_channels, out_channels):
 		super().__init__()
 		self.add_module('conv1', nn.Conv3d(in_channels, out_channels, kernel_size=1))
-		self.add_module('active1', nn.ReLU(inplace=True))
