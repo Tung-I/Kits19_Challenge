@@ -25,9 +25,6 @@ class Highresnet3D(BaseNet):
     	features = self.res_block1(features)
     	features = self.res_block2(features)
     	features = self.res_block3(features)
-    	features = self.res_block4(features)
-    	features = self.res_block5(features)
-    	features = self.res_block6(features)
     	features = self.out_block(features)
     	output = torch.softmax(features, dim=1)
     	return output
