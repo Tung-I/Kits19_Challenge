@@ -1,0 +1,69 @@
+main:
+    random_seed: 0
+    saved_dir: '/home/vincentwu-cmlab/nips2019/models/vipcup_seg/vnet/'
+
+dataset:
+    name: 'VIPCUPSegDataset'
+    kwargs:
+        data_dir: "/media/vincentwu-cmlab/5aae4c8c-ef9b-414c-acc3-814927dbe8b7/VIPCUPData2x2x3/"
+        data_split_csv: "/media/vincentwu-cmlab/5aae4c8c-ef9b-414c-acc3-814927dbe8b7/VIPCUP2018/preprocessing/dataset_split_GTV1.csv"
+        positive_sampling_rate: 0.8
+        sample_size: [192, 192, 48]
+        preprocessings:
+            - name: 'Normalize'
+        transforms:
+            - name: 'ToTensor'
+        augments:
+            - name: 'RandomHorizontalFlip'
+              kwargs:
+                  prob: 0.25
+            - name: 'RandomVerticalFlip'
+              kwargs:
+                  prob: 0.25
+
+dataloader:
+    name: 'Dataloader'
+    kwargs:
+        train_batch_size: 2
+        valid_batch_size: 1
+        shuffle: true
+        num_workers: 8
+
+net:
+    name: 'VNet'
+    kwargs:
+        in_channels: 1
+        out_channels: 2
+
+losses:
+    - name: 'DiceLoss'
+      weight: 1.0
+
+metrics:
+    - name: 'Dice'
+
+optimizer:
+    name: 'Adam'
+    kwargs:
+        lr: 0.001
+        weight_decay: 0
+        amsgrad: false
+
+logger:
+    name: 'VIPCUPSegLogger'
+    kwargs:
+        dummy_input: [2, 1, 192, 192, 48]
+
+monitor:
+    name: 'Monitor'
+    kwargs:
+        mode: 'max'
+        target: 'Dice'
+        saved_freq: 10
+        early_stop: 0
+
+trainer:
+    name: 'VIPCUPSegTrainer'
+    kwargs:
+        device: 'cuda:0'
+        num_epochs: 100

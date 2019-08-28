@@ -1,0 +1,81 @@
+main:
+    random_seed: 0
+    saved_dir: '/tmp2/tungi893610/kits19/kits19_result/seg/unet3d'
+
+dataset:
+    name: 'KitsSegDataset'
+    kwargs:
+        data_dir: "/tmp2/tungi893610/kits19/kits_preprocess_data_new"
+        data_split_csv: "/tmp2/tungi893610/kits19/dataset_split.csv"
+        #positive_sampling_rate: 1.0
+        #sample_size: [192, 192, 24]
+        train_preprocessings:
+            - name: 'Normalize'
+            - name: 'RandomCrop'
+              kwargs:
+                  size: [192, 192, 24]
+        valid_preprocessings:
+            - name: 'Normalize'
+            - name: 'PositiveCrop'
+              kwargs:
+                  positive_sampling_rate: 1.0
+                  size: [192, 192, 24]
+        transforms:
+            - name: 'ToTensor'
+        augments:
+            - name: 'RandomElasticDeformation'
+              kwargs:
+                  prob: 0.25
+            - name: 'RandomHorizontalFlip'
+              kwargs:
+                  prob: 0.25
+            - name: 'RandomVerticalFlip'
+              kwargs:
+                  prob: 0.25
+
+dataloader:
+    name: 'Dataloader'
+    kwargs:
+        train_batch_size: 2
+        valid_batch_size: 1
+        shuffle: true
+        num_workers: 8
+
+net:
+    name: 'UNet3D'
+    kwargs:
+        in_channels: 1
+        out_channels: 3
+
+losses:
+    - name: 'DiceLoss'
+      weight: 1.0
+
+metrics:
+    - name: 'Dice'
+
+optimizer:
+    name: 'Adam'
+    kwargs:
+        lr: 0.001
+        weight_decay: 0
+        amsgrad: false
+
+logger:
+    name: 'KitsSegLogger'
+    kwargs:
+        dummy_input: [16, 1, 256, 256]
+
+monitor:
+    name: 'Monitor'
+    kwargs:
+        mode: 'max'
+        target: 'Dice'
+        saved_freq: 10
+        early_stop: 0
+
+trainer:
+    name: 'KitsSegTrainer'
+    kwargs:
+        device: 'cuda:0'
+        num_epochs: 100
